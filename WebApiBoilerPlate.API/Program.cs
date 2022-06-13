@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using WebApiBoilerPlate.API.DbContexts;
@@ -23,7 +24,10 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddDbContext<ApplicationDbContext>();
 
     // configure automapper with all automapper profiles from this assembly
+    IMapper mapper = AutoMapperConfig.RegisterMaps().CreateMapper();
+    services.AddSingleton(mapper);
     services.AddAutoMapper(typeof(Program));
+
 
     // configure strongly typed settings object
     services.Configure<AppSettings>(builder.Configuration.GetSection("AppSecret"));
