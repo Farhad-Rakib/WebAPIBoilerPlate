@@ -9,7 +9,7 @@ public class AutoMapperConfig
     {
         var mappingConfig = new MapperConfiguration(config =>
         {
-            config.CreateMap<UserRegisterRequest, User>();
+            config.CreateMap<UserRegisterRequest, User>().ReverseMap();
             config.CreateMap<User, UserAuthenticateResponse>();
           
         });

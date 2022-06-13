@@ -1,22 +1,57 @@
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using WebApiBoilerPlate.API.DbContexts;
+using WebApiBoilerPlate.API.Helpers;
+using WebApiBoilerPlate.API.Helpers.Authorization;
+using WebApiBoilerPlate.API.Repositories.Interfaces;
+using WebApiBoilerPlate.API.Repositories.Repositories;
+using WebApiBoilerPlate.API.Services.Implementations;
+using WebApiBoilerPlate.API.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+{
+    var services = builder.Services;
+    var env = builder.Environment;
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(options => {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ShopConnectionStringDev"));
-});
+
+    services.AddCors();
+    services.AddControllers();
+
+    // Database Context
+    services.AddDbContext<ApplicationDbContext>();
+
+    // configure automapper with all automapper profiles from this assembly
+    services.AddAutoMapper(typeof(Program));
+
+    // configure strongly typed settings object
+    services.Configure<AppSettings>(builder.Configuration.GetSection("AppSecret"));
+
+    // configure DI for application services
+    services.AddScoped<IJwtUtils, JwtUtils>();
+    services.AddScoped<IUserRepository, UserRepository>();
+    services.AddScoped<IUserService, UserService>();
+}
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// configure HTTP request pipeline
+{
+    // global cors policy
+    app.UseCors(x => x
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
 
-app.UseAuthorization();
+    // global error handler
+    app.UseMiddleware<ErrorHandlerMiddleware>();
 
-app.MapControllers();
+    // custom jwt auth middleware
+    app.UseMiddleware<JwtMiddleware>();
 
-app.Run();
+    app.MapControllers();
+}
+
+app.Run("http://localhost:4000");

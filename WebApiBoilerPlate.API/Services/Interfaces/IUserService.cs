@@ -2,8 +2,8 @@
 using WebApiBoilerPlate.API.DTOs.Responses;
 using WebApiBoilerPlate.API.Entities;
 
-namespace WebApiBoilerPlate.API.Services.Interfaces
-{
+namespace WebApiBoilerPlate.API.Services.Interfaces;
+
     public interface IUserService
     {
         UserAuthenticateResponse Authenticate(UserAuthenticateRequest model);
@@ -13,4 +13,4 @@ namespace WebApiBoilerPlate.API.Services.Interfaces
         void Update(int id, UserUpdateRequest model);
         void Delete(int id);
     }
-}
+
